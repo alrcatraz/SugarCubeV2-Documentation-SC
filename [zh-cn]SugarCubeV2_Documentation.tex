@@ -1,0 +1,262 @@
+\documentclass[hyperref,UTF8]{ctexart}
+\usepackage[style=apa,backend=biber,sorting=none]{biblatex}
+\addbibresource{ref.bib}
+\usepackage{hyperref}
+\usepackage{fontspec}
+\usepackage{makecell}
+\usepackage{listings}
+\usepackage{xcolor}
+
+\hypersetup
+{
+    colorlinks=true,
+    bookmarks=true,
+    pdfpagemode=FullScreen,
+    pdfstartview=Fit,
+    pdftitle={SugarCube v2 文档翻译},
+    pdfauthor={Alrcatraz/Nanaly},
+}
+\lstset
+{
+    backgroundcolor=\color{gray!5},
+    frame=leftline,
+    framerule=18pt,%
+        rulecolor=\color{gray!80},
+    numbers=left,
+        stepnumber=1,
+        numbersep=7pt,
+    tabsize=2,
+    breaklines=true,
+    breakatwhitespace=false,
+    breakautoindent=true,
+    breakindent=1em,
+    xleftmargin=1em,
+    aboveskip=1ex,
+    belowskip=1ex,
+    framextopmargin=1pt,
+    framexbottommargin=1pt,
+    abovecaptionskip=-2pt,
+    belowcaptionskip=3pt,
+}%
+
+\setmainfont{Noto Serif}
+\setsansfont{Fira Code}
+\setmonofont{Fira Code}
+\setCJKmainfont{Noto Serif SC}
+\setCJKsansfont{Noto Sans SC}
+\setCJKmonofont{Noto Sans Mono CJK SC}
+
+\title{SugarCube v2 文档翻译}
+\author{Alrcatraz/Nanaly}
+\date{\today}
+
+\begin{document}
+\maketitle
+\newpage
+\tableofcontents
+
+\newpage
+\section{SugarCube基本知识}
+\subsection{简介}
+本文档为 \href{http://www.motoslave.net/sugarcube/}{SugarCube} 的参考，SugarCube是 \href{http://twinery.org/}{Twine/Twee} 的免费故事格式。
+
+\textbf{提示：} 本文档是单个网页，因此你可以使用浏览器的页面查找功能(Ctrl+F或F3)来搜索特定术语。
+\textbf{注意：} 如果您认为您在SugarCube中发现了错误，或者只是想提出建议，您可以在 \href{https://github.com/tmedwards/sugarcube-2}{源代码存储库} 中 \href{https://github.com/tmedwards/sugarcube-2/issues}{创建一个新问题} 。
+
+本文档的贡献者包括：
+\begin{itemize}
+    \item \textbf{Chaper} ( \href{https://twinelab.net/}{TwineLab}，\href{https://github.com/ChapelR/}{GitHub})
+\end{itemize}
+
+\subsection{标记}
+\textbf{注意：} 除非另有说明，否则所有标记都可用。\texttt{\textcolor{blue}{v2.0.0}}
+\paragraph{裸变量}
+
+除了使用其中一个打印宏（\texttt{\textcolor{blue}{<<print>>},\textcolor{blue}{<<=>>},\textcolor{blue}{<<->>}}）来打印TwineScript变量的值以外，SugarCube的裸变量标记还允许简单地将它们包含在普通段落文本中来打印它们————即段落文本中的变量值会转化为字符串的形式。
+
+裸变量标记支持以下形式：
+\begin{center}
+    \begin{tabular}{c|c|c}[h]
+        \centering
+        \textbf{类型} & \textbf{语法} & \textbf{用例}\\
+        \hline \hline
+        简单变量 & \$variable & \$name\\
+        \hline
+        \makecell{属性访问\\(点表示法)} & \verb|$variable.property| & \verb|$thing.name|\\
+        \hline
+        \makecell{索引/属性访问\\(方括号表示法)} & 
+        \makecell{\verb|$variable[numericIndex]| \\ \verb|$variable["property"]| \\ \verb|$variable['property']| \\ \verb|$variable[$indexOrPropertyVariable]|} & 
+        \makecell{\verb|$thing[0]| \\ \verb|$thing["name"]| \\ \verb|$thing['name']| \\ \verb|$thing[$member]|}
+    \end{tabular}
+\end{center}
+
+如果需要打印任何更复杂的内容(如使用计算或方法调用)，则仍需要使用其中一个打印宏。
+
+例如：
+\begin{lstlisting}
+    /* 通过 <<print>> 宏显式打印 $name 的值 */
+    Well hello there, <<print $name>>.
+    
+    /* 通过裸变量标记隐式打印 $name 的值 */
+    Well hello there, $name.
+    
+    /* 假设 $name 设置为“Mr. Freeman”，两者都应产生以下结果 */
+    Well hello there, Mr. Freeman.
+\end{lstlisting}
+
+因为段落文本中的变量会自动转换为它们的值，如果你真的想按原样输出变量————即不插值。对于教程、调试输出或其他内容，您需要以某种方式对其进行转义。例如：
+\begin{lstlisting}
+    /* 使用 nowiki 标记： """...""" （三个双引号） */
+    The variable """$name""" is set to: $name
+    
+    /* 使用 nowiki 标记：<nowiki>...</nowiki> */
+    The variable <nowiki>$name</nowiki> is set to: $name
+    
+    /* 使用双美元符号标记（转义 $ 符号）：$$ */
+    The variable $$name is set to: $name
+    
+    /* 假设 $name 设置为“Mr. Freeman”，以上所有内容都应产生以下结果 */
+    The variable $name is set to: Mr. Freeman
+\end{lstlisting}
+
+此外，您可以使用内联代码标记来转义变量，尽管它也会将转义变量包装在元素中，因此它可能最适合用于示例和教程。例如：
+\begin{lstlisting}
+    /* 使用内联代码标记：{{{…}}}（三重花括号） */
+    The variable {{{$name}}} is set to: $name
+    
+    /* 假设 $name 设置为“Mr. Freeman”，它应该产生以下结果 */
+    The variable <code>$name</code> is set to: Mr. Freeman
+\end{lstlisting}
+
+\paragraph{链接}
+SugarCube 的链接标记由必需组件和可选组件组成。组件可以是纯文本，也可以是任何有效的 TwineScript 表达式，这些表达式将在早期（即最初处理链接时）进行处理。该组件仅适用于段落链接，必须是 \href{https://www.motoslave.net/sugarcube/2/docs/#macros-macro-set}{<<set>> 宏} 变体的有效 \href{https://www.motoslave.net/sugarcube/2/docs/#twinescript-expressions}{TwineScript} 表达式，该表达式将在后期（即单击链接时）进行计算。
+
+组件值可以是段落的标题，也可以是资源（本地或远程）的任何有效 URL。
+
+除了用于分离和组件的标准管道分离器()外，SugarCube 还支持箭头分离器 (\&)。特别是对于箭头分隔符，箭头的方向决定了元件的顺序，箭头始终指向元件————即，右箭头的工作方式类似于管道分隔符，而左箭头则相反。
+
+\textbf{警告(Twee2)：} 由于 Twine 2 自动段落创建功能目前的工作方式，对组件使用任何 TwineScript 表达式都会导致创建以表达式命名的段落，该段落需要删除。为了避免此问题，建议您在需要使用表达式时使用 Twine 2 中 \href{https://www.motoslave.net/sugarcube/2/docs/#macros-macro-set}{<<set>> 宏} 的单独参数形式。
+
+以下是一个例子：
+\begin{center}
+    \begin{tabular}{c|c}
+        语法 & 例子\\
+        \hline \hline
+        verb|[[Link]]| & \makecell{\verb|[[Grocery]]| \\ \verb|[[$go]]|}\\
+        \verb|[[Link|Link]]| & \makecell{\verb|[[Go buy milk|Grocery]]| \\ \verb|[[$show|$go]]|}\\
+        \verb|[[Link][Setter]]| & \makecell{\verb|[[Grocery][ $bought to "milk"]]| \\ \verb|[[$go][$bought to "milk"]]|}\\
+        \verb|[[Text|Link][Setter]]| & \makecell{\verb|[[Go buy milk|Grocery][$bought to "milk"]]| \\ \verb|[[$show|$go][$bought to "milk"]]|}\\
+    \end{tabular}
+\end{center}
+
+\newpage
+\subsection{TwineScript}
+
+\newpage
+\subsection{宏}
+
+\newpage
+\subsection{函数}
+
+\newpage
+\subsection{方法}
+
+\newpage
+\subsection{特殊名称}
+
+\newpage
+\subsection{CSS样式表}
+
+\newpage
+\subsection{HTML}
+
+\newpage
+\subsection{事件}
+
+\newpage
+\section{API}
+\subsection{配置API}
+
+\newpage
+\subsection{对话API}
+
+\newpage
+\subsection{引擎API}
+
+\newpage
+\subsection{全屏API}
+
+\newpage
+\subsection{加载屏幕API}
+
+\newpage
+\subsection{宏API}
+
+\subsubsection{宏文本API}
+
+\newpage
+\subsection{通道API}
+
+\newpage
+\subsection{保存API}
+
+\newpage
+\subsection{设置API}
+
+\newpage
+\subsection{简单音频API}
+
+\subsubsection{音频API}
+
+\subsubsection{音频播放器API}
+
+\subsubsection{音频列表API}
+
+\newpage
+\subsection{状态API}
+
+\newpage
+\subsection{故事API}
+
+\newpage
+\subsection{模板API}
+
+\newpage
+\subsection{用户界面API}
+
+\newpage
+\subsection{UIBar API}
+
+\newpage
+\section{指南}
+\subsection{指南：状态、会话和保存}
+
+\newpage
+\subsection{指南：小贴士}
+
+\newpage
+\subsection{指南：媒体段落}
+
+\newpage
+\subsection{指南：从Harlowe到SugarCube}
+
+\newpage
+\subsection{指南：测试模式}
+
+\newpage
+\subsection{指南：TypeScript}
+
+\newpage
+\subsection{指南：安装}
+
+\newpage
+\subsection{指南：代码更新}
+
+\newpage
+\subsection{指南：本地化}
+
+\newpage
+\nocite{SCv2Doc}
+\printbibliography[title=参考文献]
+
+\end{document}
